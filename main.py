@@ -41,6 +41,23 @@ class Index(webapp2.RequestHandler):
 
         # TODO 1
         # Include another form so the user can "cross off" a movie from their list.
+        delete_form = """
+        <form action="/delete" method="post">
+            <label>
+                I want to delete
+                <select type="text" name="watched-movie">
+                    <option value="Spotlight">Spotlight</option>
+                    <option value="The Big Short">The Big Short</option>
+                    <option value="Bridge of Spies">Bridge of Spies</option>
+                    <option value="Brooklyn">Brooklyn</option>
+                    <option value="The Martian">The Martian</option>
+                    <option value="The Revenant">The Revenant</option>
+                </select>
+                from my watchlist.
+            </label>
+            <input type="submit" value="Remove It"/>
+        </form>
+        """
 
 
         # TODO 4 (Extra Credit)
@@ -48,7 +65,7 @@ class Index(webapp2.RequestHandler):
         # text box (<input type="text"/>)
 
 
-        content = page_header + edit_header + add_form + page_footer
+        content = page_header + edit_header + add_form + delete_form + page_footer
         self.response.write(content)
 
 
@@ -68,6 +85,21 @@ class AddMovie(webapp2.RequestHandler):
         content = page_header + "<p>" + sentence + "</p>" + page_footer
         self.response.write(content)
 
+class CrossOffMovie(webapp2.RequestHandler):
+    """ Handles requests coming into '/delete'
+        e.g. flicklist.com/delete
+    """
+
+    def post(self):
+        # look inside the request to figure out what the user typed
+        watched_movie = self.request.get("watched-movie")
+
+        # build response content
+        watched_movie_element = "<strike>" + watched_movie + "</strike>"
+        sentence = watched_movie_element + " has been removed from your Watchlist!"
+
+        content = page_header + "<p>" + sentence + "</p>" + page_footer
+        self.response.write(content)
 
 # TODO 2
 # Create a new RequestHandler class called CrossOffMovie, to receive and
@@ -76,9 +108,8 @@ class AddMovie(webapp2.RequestHandler):
 
 
 
-# TODO 3
-# Include a route for your cross-off handler, by adding another tuple to the list below.
 app = webapp2.WSGIApplication([
     ('/', Index),
-    ('/add', AddMovie)
+    ('/add', AddMovie),
+    ('/delete', CrossOffMovie)
 ], debug=True)
