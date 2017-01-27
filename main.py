@@ -29,9 +29,9 @@ page_footer = """
 # a list of movies that nobody should be allowed to watch
 terrible_movies = [
     "Gigli",
-    "Star Wars Episode 1: Attack of the Clones",
     "Paul Blart: Mall Cop 2",
-    "Nine Lives"
+    "Nine Lives",
+    "Da Hip Hop Witch"
 ]
 
 
@@ -101,19 +101,20 @@ class AddMovie(webapp2.RequestHandler):
         # look inside the request to figure out what the user typed
         new_movie = self.request.get("new-movie")
 
-        # TODO 2
+        sanitized_new_movie = cgi.escape(new_movie, True)
+
         # if the user typed nothing at all, redirect and yell at them
+        if sanitized_new_movie == "":
+            error = "You didn't enter a movie!"
+            self.redirect("/?error=" + error)
 
-
-        # TODO 3
         # if the user wants to add a terrible movie, redirect and yell at them
-
-
-        # TODO 1
-        # 'escape' the user's input so that if they typed HTML, it doesn't mess up our site
+        if sanitized_new_movie in terrible_movies:
+            error = "That movie is terrible! I won't keep track of that!"
+            self.redirect("/?error=" + error)
 
         # build response content
-        new_movie_element = "<strong>" + new_movie + "</strong>"
+        new_movie_element = "<strong>" + sanitized_new_movie + "</strong>"
         sentence = new_movie_element + " has been added to your Watchlist!"
         content = page_header + "<p>" + sentence + "</p>" + page_footer
         self.response.write(content)
